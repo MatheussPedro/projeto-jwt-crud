@@ -1,0 +1,17 @@
+{   
+  "name": "projeto-jwt-crud",
+  "version": "1.0.0",
+  "description": "Projeto backend com JWT, Express e outras libs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Seu Nome",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "jsonwebtoken": "^9.0.0"
+  }
+}
