@@ -27,6 +27,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+
 volumes:
   node_modules:
   pgdata:
