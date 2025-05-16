@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tarefas - CRUD</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; }
+    input, button { padding: 8px; margin: 4px 0; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 6px 0; }
+    .task-text { display: inline-block; width: 70%; }
+    .btn { cursor: pointer; margin-left: 5px; }
+  </style>
+</head>
+<body>
+  <h2>Minhas Tarefas</h2>
+  <button onclick="logout()">Sair</button>
+  <div>
+    <input type="text" id="newTask" placeholder="Nova tarefa" />
+    <button onclick="addTask()">Adicionar</button>
+  </div>
+  <ul id="taskList"></ul>
+
+  <script>
+    const API_URL = 'http://localhost:3000/tasks';
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Você precisa fazer login.');
+      window.location.href = 'index.html';
+    }
+
+    async function fetchTasks() {
+      const res = await fetch(API_URL, {
+        headers: { 'Authorization': token }
+      });
+      if (!res.ok) {
+        alert('Erro ao carregar tarefas. Faça login novamente.');
+        logout();
+        return;
+      }
+      const tasks = await res.json();
+      const ul = document.getElementById('taskList');
+      ul.innerHTML = '';
+      tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="task-text" contenteditable="true" onblur="editTask(${t.id}, this.textContent)">${t.title}</span>
+          <button class="btn" onclick="deleteTask(${t.id})">🗑️</button>
+        `;
+        ul.appendChild(li);
+      });
+    }
+
+    async function addTask() {
+      const input = document.getElementById('newTask');
+      const title = input.value.trim();
+      if (!title) return alert('Digite uma tarefa');
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': token },
+        body: JSON.stringify({ title })
+      });
+      if (!res.ok) return alert('Erro ao adicionar');
+      input.value = '';
+      fetchTasks();
+    }
+
+    async function editTask(id, newTitle) {
+      newTitle = newTitle.trim();
+      if (!newTitle) return alert('Título não pode ser vazio');
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': token },
+        body: JSON.stringify({ title: newTitle })
+      });
+      if (!res.ok) alert('Erro ao atualizar tarefa');
+      fetchTasks();
+    }
+
+    async function deleteTask(id) {
+      if (!confirm('Deseja realmente excluir?')) return;
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': token }
+      });
+      if (!res.ok) alert('Erro ao deletar');
+      fetchTasks();
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    fetchTasks();
+  </script>
+</body>
+</html>

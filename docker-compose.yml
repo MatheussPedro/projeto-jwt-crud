@@ -7,6 +7,26 @@ services:
     volumes:
       - ./backend:/app
       - node_modules:/app/node_modules
+    environment:
+      - DB_HOST=db
+      - DB_USER=postgres
+      - DB_PASSWORD=senha123
+      - DB_NAME=projeto_jwt
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha123
+      POSTGRES_DB: projeto_jwt
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
   node_modules:
+  pgdata:
